@@ -19,6 +19,10 @@ def sigmoid(Z):
     cache = Z
     
     return A, cache
+def softmax(Z):
+    expZ = np.exp(Z - np.max(Z, axis=0, keepdims=True))  # Stability improvement
+    cache = Z
+    return expZ / np.sum(expZ, axis=0, keepdims=True),cache
 
 def relu(Z):
     """
@@ -207,6 +211,9 @@ def linear_activation_forward(A_prev, W, b, activation):
         # Inputs: "A_prev, W, b". Outputs: "A, activation_cache".
         Z, linear_cache = linear_forward(A_prev, W, b)
         A, activation_cache = relu(Z)
+    elif activation == "softmax": 
+        Z, linear_cache = linear_forward(A_prev, W, b)
+        A ,activation_cache = softmax(Z)
         
     else:
         print("\033[91mError! Please make sure you have passed the value correctly in the \"activation\" parameter")
@@ -242,7 +249,7 @@ def L_model_forward(X, parameters):
         caches.append(cache)
     
     # Implement LINEAR -> SIGMOID. Add "cache" to the "caches" list.
-    AL, cache = linear_activation_forward(A, parameters['W' + str(L)], parameters['b' + str(L)], activation = "sigmoid")
+    AL, cache = linear_activation_forward(A, parameters['W' + str(L)], parameters['b' + str(L)], activation = "softmax")
     caches.append(cache)
     
     assert(AL.shape == (1,X.shape[1]))
